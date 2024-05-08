@@ -25,46 +25,15 @@ opyright notice and this permission notice shall be included in all
 
 #include <string>
 #include <fstream>
-
-namespace LOG{
-//using a class so that multiple LOGfiles can be placed at diffrent directory
-enum CONFIG{WITH_TIME,		//enum to act as the time switch for the LOGfile
-			WITHOUT_TIME,
-            DEFAULT};
-class LOG{
+//using a class so that we can have objects
+class Log{
 private:
-	std::string log_file_path;
-	const std::string lfname = "LOG.txt";	//set LOGfile name
-	int time_switch = CONFIG::WITH_TIME;		//specifies if time and date should be enabled in the LOG file
-	void create_LOGfile();
-	std::ofstream olfstream;		//LOGfile's output file stream
-	std::string lfdir;	//directory + filename
 	
 
-public:	
-	LOG(std::string logfile_path,int time_switch);
-    
-	LOG();
-	~LOG();
-    
-    //initialize the LOGfile by creating a file
-	void create_file(std::string logfile_path,int time_switch){
-		this->log_file_path = logfile_path;
-		this->time_switch = time_switch;
-		this->lfdir = logfile_path + this->lfname;
-		create_LOGfile();
-	}
-	
-	void create_file(std::string logfile_path){
-		this->LOG_file_path = logfile_path;
-		this->lfdir = logfile_path + this->lfname;
-		create_LOGfile();
-	}
-	
-	void message(std::string function_name,std::string message);
-	
-	
-	void close();
-}; 
-
-}
+public:
+	void info();
+	void config();
+	void warning();
+	void error();
+	void critical();
+};

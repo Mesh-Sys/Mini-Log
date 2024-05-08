@@ -25,9 +25,9 @@
 #include <regex>
 #include "log.h"
 
-LOG::LOG::LOG(std::string logfile_path,int time_switch){
+LOG::LOG::LOG(std::string logfile_path,int config){
 		this->LOG_file_path = logfile_path;
-		this->time_switch = time_switch;
+		this->config = time_switch;
 		this->lfdir = logfile_path + this->lfname;
 		create_LOGfile();
 	}
