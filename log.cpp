@@ -25,13 +25,13 @@
 #include <regex>
 #include "log.h"
 
-log::log(std::string Logfile_path,int time_switch){
-		this->log_file_path = Logfile_path;
+LOG::LOG::LOG(std::string logfile_path,int time_switch){
+		this->LOG_file_path = logfile_path;
 		this->time_switch = time_switch;
-		this->lfdir = Logfile_path + this->lfname;
-		create_logfile();
+		this->lfdir = logfile_path + this->lfname;
+		create_LOGfile();
 	}
-void log::message(std::string function_name,std::string message){	//write message to log
+void LOG::LOG::message(std::string function_name,std::string message){	//write message to LOG
 	std::time_t curr_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	std::string current_time = std::ctime(&curr_time);
 	std::string outputlog;
@@ -40,33 +40,33 @@ void log::message(std::string function_name,std::string message){	//write messag
 		current_time = std::regex_replace(current_time,std::regex("\n")," ] ");
 	}
 	
-	if(log::time_switch == tenum::WITH_TIME){
+	if(LOG::time_switch == CONFIG::WITH_TIME){
 		outputlog = "[" + current_time + " [" + function_name + "] " + message;
-	}else if(log::time_switch == tenum::WITHOUT_TIME){
+	}else if(LOG::time_switch == CONFIG::WITHOUT_TIME){
 		outputlog = message;
 	}
 
-	checklog:
-	if(log::olfstream.is_open()){
-		log::olfstream << outputlog << std::endl;
+	checkLOG:
+	if(LOG::olfstream.is_open()){
+		LOG::olfstream << outputlog << std::endl;
 	}else{
-		log::olfstream.open(log::lfdir.c_str(),std::ios::out|std::ios::app);
-		goto checklog;
+		LOG::olfstream.open(LOG::lfdir.c_str(),std::ios::out|std::ios::app);
+		goto checkLOG;
 	}
 }
 
-void log::create_log(){
-	if(!log::olfstream.is_open()){
-		log::olfstream.open(log::lfdir.c_str(),std::ios::out|std::ios::app);
+void LOG::LOG::create_LOGfile(){
+	if(!LOG::olfstream.is_open()){
+		LOG::olfstream.open(LOG::lfdir.c_str(),std::ios::out|std::ios::app);
 	}
 }
 
-void log::close(){
-	if(log::olfstream.is_open()){
-		log::olfstream.close();
+void LOG::LOG::close(){
+	if(LOG::olfstream.is_open()){
+		LOG::olfstream.close();
 	}
 }
-log::~log()
+LOG::LOG::~LOG()
 {
 }
  

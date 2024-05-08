@@ -9,7 +9,9 @@
 	copies of the Software, and to permit persons to whom the Software is
 	furnished to do so, subject to the following conditions:
 	
-	The above copyright notice and this permission notice shall be included in all
+	The above c
+}
+opyright notice and this permission notice shall be included in all
 	copies or substantial portions of the Software.
 	
 	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -24,36 +26,39 @@
 #include <string>
 #include <fstream>
 
-//using a class so that multiple Logfiles can be placed at diffrent directory
-enum tenum{WITH_TIME,		//enum to act as the time switch for the Logfile
-			WITHOUT_TIME};
-class log{
+namespace LOG{
+//using a class so that multiple LOGfiles can be placed at diffrent directory
+enum CONFIG{WITH_TIME,		//enum to act as the time switch for the LOGfile
+			WITHOUT_TIME,
+            DEFAULT};
+class LOG{
 private:
 	std::string log_file_path;
-	const std::string lfname = "log.txt";	//set Logfile name
-	int time_switch = tenum::WITH_TIME;		//specifies if time and date should be enabled in the log file
-	void create_logfile();
-	std::ofstream olfstream;		//Logfile's output file stream
+	const std::string lfname = "LOG.txt";	//set LOGfile name
+	int time_switch = CONFIG::WITH_TIME;		//specifies if time and date should be enabled in the LOG file
+	void create_LOGfile();
+	std::ofstream olfstream;		//LOGfile's output file stream
 	std::string lfdir;	//directory + filename
 	
 
 public:	
-	log(std::string Logfile_path,int time_switch);
-	log();
-	~log();
+	LOG(std::string logfile_path,int time_switch);
     
-    //initialize the logfile by creating a file
-	void create_file(std::string Logfile_path,int time_switch){
-		this->log_file_path = Logfile_path;
+	LOG();
+	~LOG();
+    
+    //initialize the LOGfile by creating a file
+	void create_file(std::string logfile_path,int time_switch){
+		this->log_file_path = logfile_path;
 		this->time_switch = time_switch;
-		this->lfdir = Logfile_path + this->lfname;
-		create_logfile();
+		this->lfdir = logfile_path + this->lfname;
+		create_LOGfile();
 	}
 	
-	void create_file(std::string Logfile_path){
-		this->log_file_path = Logfile_path;
-		this->lfdir = Logfile_path + this->lfname;
-		create_logfile();
+	void create_file(std::string logfile_path){
+		this->LOG_file_path = logfile_path;
+		this->lfdir = logfile_path + this->lfname;
+		create_LOGfile();
 	}
 	
 	void message(std::string function_name,std::string message);
@@ -61,3 +66,5 @@ public:
 	
 	void close();
 }; 
+
+}
