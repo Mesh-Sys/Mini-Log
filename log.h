@@ -27,6 +27,12 @@
 #include <chrono>
 #include <ctime>
 #include <regex>
+//define logging level
+#define INFO 1
+#define WARNING 2
+#define DEBUG 3
+#define VERBOSE 4
+#define ERROR 5
 //using a class so that we can have objects
 class Log{
 private:
@@ -40,19 +46,35 @@ public:
 	Log(std::string logfile_path,std::string logfile_name);
 	~Log();
 	void init(std::string logfile_path,std::string logfile_name);
-	void info(std::string msg);
-	void debug(std::string msg);
-	void close();
-	void warning(std::string msg);
-	void error(std::string msg);
-	void verbose(std::string msg);
-	void message();
 
+	void info(std::string msg){
+		message(INFO,msg);
+	}
+
+	void warning(std::string msg){
+		message(WARNING,msg);
+	}
+
+	void debug(std::string msg){
+		message(DEBUG,msg);
+	}
+
+	void verbose(std::string msg){
+		message(VERBOSE,msg);
+	}
+
+	void error(std::string msg){
+		message(ERROR,msg);
+	}
+
+	void message(int level,std::string msg);
+	void close();
 };
 
 Log::Log(std::string logfile_path,std::string logfile_name){
-	Log::init();
+	Log::init(logfile_path,logfile_name);
 }
+
 void Log::init(std::string logfile_path,std::string logfile_name){
 	if(!Log::intialise){
 		if(logfile_name == NULL){
@@ -69,16 +91,11 @@ void Log::init(std::string logfile_path,std::string logfile_name){
 		}catch(const exception &e){
 			std::cerr << "Error occured while opening logfile in : " << __func__ << ":Exception - " << e.what();  
 		}
-		
 		Log::intialise = true;
 	}	
 }
-void Log::close(){
-	if(Log::olfstream.is_open()){
-		Log::olfstream.close();
-	}
-}
-void Log::openlogfile(){
+
+void Log::openlogfile(){	//open logfile if it is closed
 	if(!LOG::olfstream.is_open()){
 		try{
 			Log::olfstream.open(Log::file_dir.c_str(),std::ios::out|std::ios::app);
@@ -88,8 +105,7 @@ void Log::openlogfile(){
 	}
 }
 
-
-void LOG::LOG::message(std::string function_name,std::string message){	//write message to LOG
+void Log::message(int level,std::string msg){	//write message to LOG
 	std::time_t curr_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	std::string current_time = std::ctime(&curr_time);
 	std::string outputlog;
@@ -98,22 +114,41 @@ void LOG::LOG::message(std::string function_name,std::string message){	//write m
 		current_time = std::regex_replace(current_time,std::regex("\n")," ] ");
 	}
 	
-	if(LOG::time_switch == CONFIG::WITH_TIME){
-		outputlog = "[" + current_time + " [" + function_name + "] " + message;
-	}else if(LOG::time_switch == CONFIG::WITHOUT_TIME){
-		outputlog = message;
+	switch(level){
+		case INFO:
+			outputlog = "[" + current_time + "] INFO: " + msg;
+		break;
+		case WARNING:
+			outputlog = "[" + current_time + "] WARNING: " + msg;
+		break;
+		case DEBUG:
+			outputlog = "[" + current_time + "] DEBUG: " + msg;
+		break;
+		case VERBOSE:
+			outputlog = "[" + current_time + "] VERBOSE: " + msg;
+		break;
+		case ERROR:
+			outputlog = "[" + current_time + "] ERROR: " + msg;
+		break;
+		default:
+			outputlog = "[" + current_time + "] UNKNOWN: " + msg;
+		break;
 	}
 
-	checkLOG:
-	if(LOG::olfstream.is_open()){
-		LOG::olfstream << outputlog << std::endl;
+	checkLogFileAvailability:
+	if(Log::olfstream.is_open()){
+		Log::olfstream << outputlog << std::endl;
 	}else{
-		LOG::olfstream.open(LOG::lfdir.c_str(),std::ios::out|std::ios::app);
-		goto checkLOG;
+		Log::openlogfile();
+		goto checkLogFileAvailability;
 	}
 }
 
-
+void Log::close(){
+	if(Log::olfstream.is_open()){
+		Log::olfstream.close();
+	}
+}
 
 LOG::LOG::~LOG()
 {
