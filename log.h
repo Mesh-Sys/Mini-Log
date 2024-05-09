@@ -36,18 +36,21 @@
 #define VERBOSE 4
 #define ERROR 5
 
+//define default filename and directory
+#define DEFAULT "default_file"
+
 //using a class so that we can have logging level has method 
 class Log{
 private:
 	const std::string default_filename = "Log.txt";
-	ofstream olfstream;
+	std::ofstream olfstream;
 	bool intialised = false;
 	std::string file_dir;
 	void openlogfile();
 
 public:
+	Log();
 	Log(std::string logfile_path,std::string logfile_name);
-	~Log();
 	void init(std::string logfile_path,std::string logfile_name);
 
 	void info(std::string msg){
@@ -77,13 +80,15 @@ public:
 Log::Log(std::string logfile_path,std::string logfile_name){
 	Log::init(logfile_path,logfile_name);
 }
+Log::Log(){
 
+}
 void Log::init(std::string logfile_path,std::string logfile_name){
 	if(!Log::intialised){
-		if(logfile_name == NULL){
+		if(logfile_name == "default_file"){
 			logfile_name = Log::default_filename;
 		}
-		if(logfile_path == NULL){
+		if(logfile_path == "default_file"){
 			logfile_path = "";
 			Log::file_dir = logfile_name;
 		}else{
@@ -93,19 +98,25 @@ void Log::init(std::string logfile_path,std::string logfile_name){
 		}
 		try{
 			Log::olfstream.open(Log::file_dir.c_str(),std::ios::out|std::ios::app);
-		}catch(const exception &e){
-			std::cerr << "Error occured while opening logfile in : " << __func__ << ":Exception - " << e.what();  
+			if(!Log::olfstream.is_open()){
+				throw("Could Not open");
+			}
+		}catch(std::string e){
+			std::cerr << "Error occured while opening logfile in : " << __func__ << ":Exception - " << e;  
 		}
 		Log::intialised = true;
 	}	
 }
 
 void Log::openlogfile(){	//open logfile if it is closed
-	if(!LOG::olfstream.is_open()){
+	if(!Log::olfstream.is_open()){
 		try{
 			Log::olfstream.open(Log::file_dir.c_str(),std::ios::out|std::ios::app);
-		}catch(const exception &e){
-			std::cerr << "Error occured while opening logfile in : " << __func__ << ":Exception - " << e.what();  
+			if(!Log::olfstream.is_open()){
+				throw("Could Not open");
+			}
+		}catch(std::string e){
+			std::cerr << "Error occured while opening logfile in : " << __func__ << ":Exception - " << e;  
 		}
 	}
 }
@@ -113,11 +124,15 @@ void Log::openlogfile(){	//open logfile if it is closed
 void Log::message(int level,std::string msg){	//write message to LOG
 	if(Log::intialised){
 		std::time_t curr_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		std::string current_time = std::ctime(&curr_time);
+		char time_buf[23];
+       
+        std::strftime(time_buf, sizeof(time_buf),"%Y-%m-%d  %H:%M:%S", std::localtime(&curr_time)); 
+
+		std::string current_time = time_buf;
 		std::string outputlog;
 		
 		if(std::regex_search(current_time,std::regex("\n"))){
-			current_time = std::regex_replace(current_time,std::regex("\n")," ] ");
+			current_time = std::regex_replace(current_time,std::regex("\n"),"");
 		}
 		
 		switch(level){
@@ -155,7 +170,4 @@ void Log::close(){
 	if(Log::olfstream.is_open()){
 		Log::olfstream.close();
 	}
-}
-
-Log::~Log(){
 }

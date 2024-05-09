@@ -2,8 +2,8 @@
 #include "log.h"
 
 //intialise logger by creating an object
-Log log(NULL,NULL); //if logfile path is NULL it would the directory the program executed from
-					// if the logfile name is NULL it would use the default logfile name "Log.txt"
+Log log(DEFAULT,DEFAULT); //if logfile path is DEFAULT it would the directory the program executed from
+					// if the logfile name is DEFAULT it would use the default logfile name "Log.txt"
 
 int main(){
 	//using individual method
