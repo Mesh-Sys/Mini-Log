@@ -18,7 +18,8 @@
 	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.**/
+	SOFTWARE.
+**/
 #pragma once
 
 #include <string>
@@ -27,18 +28,20 @@
 #include <chrono>
 #include <ctime>
 #include <regex>
+
 //define logging level
 #define INFO 1
 #define WARNING 2
 #define DEBUG 3
 #define VERBOSE 4
 #define ERROR 5
-//using a class so that we can have objects
+
+//using a class so that we can have logging level has method 
 class Log{
 private:
 	const std::string default_filename = "Log.txt";
 	ofstream olfstream;
-	bool intialise = false;
+	bool intialised = false;
 	std::string file_dir;
 	void openlogfile();
 
@@ -76,7 +79,7 @@ Log::Log(std::string logfile_path,std::string logfile_name){
 }
 
 void Log::init(std::string logfile_path,std::string logfile_name){
-	if(!Log::intialise){
+	if(!Log::intialised){
 		if(logfile_name == NULL){
 			logfile_name = Log::default_filename;
 		}
@@ -84,14 +87,16 @@ void Log::init(std::string logfile_path,std::string logfile_name){
 			logfile_path = "";
 			Log::file_dir = logfile_name;
 		}else{
-			Log::file_dir = logfile_path +  "/" + logfile_name;
+			if(std::filesystem::exists(logfile_path.c_str())){	//check if logfile directory(if defined) exists
+				Log::file_dir = logfile_path +  "/" + logfile_name;
+			}
 		}
 		try{
 			Log::olfstream.open(Log::file_dir.c_str(),std::ios::out|std::ios::app);
 		}catch(const exception &e){
 			std::cerr << "Error occured while opening logfile in : " << __func__ << ":Exception - " << e.what();  
 		}
-		Log::intialise = true;
+		Log::intialised = true;
 	}	
 }
 
@@ -106,42 +111,44 @@ void Log::openlogfile(){	//open logfile if it is closed
 }
 
 void Log::message(int level,std::string msg){	//write message to LOG
-	std::time_t curr_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	std::string current_time = std::ctime(&curr_time);
-	std::string outputlog;
+	if(Log::intialised){
+		std::time_t curr_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		std::string current_time = std::ctime(&curr_time);
+		std::string outputlog;
+		
+		if(std::regex_search(current_time,std::regex("\n"))){
+			current_time = std::regex_replace(current_time,std::regex("\n")," ] ");
+		}
+		
+		switch(level){
+			case INFO:
+				outputlog = "[" + current_time + "] INFO: " + msg;
+			break;
+			case WARNING:
+				outputlog = "[" + current_time + "] WARNING: " + msg;
+			break;
+			case DEBUG:
+				outputlog = "[" + current_time + "] DEBUG: " + msg;
+			break;
+			case VERBOSE:
+				outputlog = "[" + current_time + "] VERBOSE: " + msg;
+			break;
+			case ERROR:
+				outputlog = "[" + current_time + "] ERROR: " + msg;
+			break;
+			default:
+				outputlog = "[" + current_time + "] UNKNOWN: " + msg;
+			break;
+		}
 	
-	if(std::regex_search(current_time,std::regex("\n"))){
-		current_time = std::regex_replace(current_time,std::regex("\n")," ] ");
-	}
-	
-	switch(level){
-		case INFO:
-			outputlog = "[" + current_time + "] INFO: " + msg;
-		break;
-		case WARNING:
-			outputlog = "[" + current_time + "] WARNING: " + msg;
-		break;
-		case DEBUG:
-			outputlog = "[" + current_time + "] DEBUG: " + msg;
-		break;
-		case VERBOSE:
-			outputlog = "[" + current_time + "] VERBOSE: " + msg;
-		break;
-		case ERROR:
-			outputlog = "[" + current_time + "] ERROR: " + msg;
-		break;
-		default:
-			outputlog = "[" + current_time + "] UNKNOWN: " + msg;
-		break;
-	}
-
-	checkLogFileAvailability:
-	if(Log::olfstream.is_open()){
-		Log::olfstream << outputlog << std::endl;
-	}else{
-		Log::openlogfile();
-		goto checkLogFileAvailability;
-	}
+		checkLogFileAvailability:
+		if(Log::olfstream.is_open()){
+			Log::olfstream << outputlog << std::endl;
+		}else{
+			Log::openlogfile();
+			goto checkLogFileAvailability;
+		}
+	}	
 }
 
 void Log::close(){
@@ -150,6 +157,5 @@ void Log::close(){
 	}
 }
 
-LOG::LOG::~LOG()
-{
+Log::~Log(){
 }
