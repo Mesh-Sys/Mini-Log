@@ -9,7 +9,7 @@ example.cpp shows a good example
   intialize the logger
   
     Log log(Null,Null);  //if logfile path is NULL it would the directory the program executed from
-					              // if the logfile name is NULL it would use the default logfile name "Log.txt"
+			// if the logfile name is NULL it would use the default logfile name "Log.txt"
 		   
     Log log("log/","log1.txt");  //seperate log directory, custom logfile name
     
@@ -22,29 +22,29 @@ example.cpp shows a good example
 
    //using logging level methods
    
-   log.info("message");	//using info method
+   	log.info("message");	//using info method
    
-   log.warning("message");	//using warning method
+   	log.warning("message");	//using warning method
    
-   log.debug("message");	//using debug method
+   	log.debug("message");	//using debug method
    
-   log.verbose("message");	//using verbose method
+   	log.verbose("message");	//using verbose method
    
-   log.error("message");	//using error method
+   	log.error("message");	//using error method
 
    //using message method and specifying logging level
    
-   log.message(INFO,"message");
+   	log.message(INFO,"message");
    
-   log.message(WARNING,"message");
+   	log.message(WARNING,"message");
    
-   log.message(DEBUG,"message");
+   	log.message(DEBUG,"message");
    
-   log.message(VERBOSE,"message");
+   	log.message(VERBOSE,"message");
    
-   log.message(ERROR,"message");
+   	log.message(ERROR,"message");
    
 #step 3:
   close Log file(deinitialize the logger)
   
-  log.close();
+  	log.close();
